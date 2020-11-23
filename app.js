@@ -43,7 +43,7 @@ async function login(req, res) {
     const user = req.body;
     let params = [user.email,user.password];
     console.log(params);
-    const result = await pool.query("SELECT id, name, email, password FROM users WHERE email = ? and password= ?", params);
+    const result = await pool.query("SELECT id, name, email,role FROM users WHERE email = ? and password= ?", params);
     const users= result[0];
     if (users.length ==0){
         throw new Error("Invalid Login Credentials");
