@@ -19,6 +19,8 @@
   "homepage": "https://github.com/sf-fresher-batch-2020/ticketapp-api#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "jsonwebtoken": "^8.5.1"
+    "express": "^5.0.0-alpha.8",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.2.5"
   }
 }

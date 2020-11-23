@@ -25,6 +25,10 @@ app.post('/api/users', createUser);
 app.get('/api/users', getAllUsers);
 app.post('/api/users/login', login);
 
+//tickets
+app.post('/api/tickets', createTicket);
+
+
 // Functions
 async function createUser(req, res) {
     let user = req.body;
@@ -49,6 +53,13 @@ async function login(req, res) {
         throw new Error("Invalid Login Credentials");
       }
     res.status(201).json(users[0]);
+}
+// Ticket Function
+async function createTicket(req, res) {
+    const ticket = req.body;
+    let params = [ticket.title, ticket.priority,ticket.department,ticket.description,ticket.mobileNumber,ticket.createdBy,ticket.teamAssigned];
+    const result = await pool.query("INSERT INTO tickets (title,priority,department,description,mobile_number, created_by, team_assign) VALUES (?,?,?,?,?,?,?)", params);
+    res.status(201).json({ id: result[0].insertId });
 }
 
  // Create Commmon Error Handler
