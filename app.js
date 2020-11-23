@@ -28,7 +28,7 @@ app.post('/api/users/login', login);
 //tickets
 app.post('/api/tickets', createTicket);
 app.get('/api/tickets', getAllTickets);
-
+app.get('/api/tickets/:id', getTicket);
 // Functions
 async function createUser(req, res) {
     let user = req.body;
@@ -73,6 +73,17 @@ async function getAllTickets(req, res) {
     res.json({errorMessage:err.message});
 })
 
+async function getTicket(req, res) {
+    const id = req.params.id;
+    let params = [id];
+    console.log(params);
+    const result = await pool.query("SELECT *FROM users WHERE id = ?", params);
+    const users= result[0];
+    if (users.length ==0){
+        throw new Error("Invalid Ticket Id");
+      }
+    res.status(201).json(users[0]);
+}
 
 app.get("/", (req, res) => res.send({ message: "REST API Service is working" }));
 
