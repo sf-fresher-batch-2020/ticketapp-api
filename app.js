@@ -27,7 +27,7 @@ app.post('/api/users/login', login);
 
 //tickets
 app.post('/api/tickets', createTicket);
-
+app.get('/api/tickets', getAllTickets);
 
 // Functions
 async function createUser(req, res) {
@@ -62,6 +62,10 @@ async function createTicket(req, res) {
     res.status(201).json({ id: result[0].insertId });
 }
 
+async function getAllTickets(req, res) {
+    const result = await pool.query("SELECT * FROM tickets");
+    res.status(200).json(result[0]);
+}
  // Create Commmon Error Handler
  app.use(function (err, req, res, next) {
     console.log("common error handler")
