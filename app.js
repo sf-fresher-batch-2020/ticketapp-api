@@ -51,7 +51,6 @@ async function getAllUsers(req, res) {
 async function login(req, res) {
     const user = req.body;
     let params = [user.email, user.password];
-    console.log(params);
     const result = await pool.query("SELECT id, name, email,role FROM users WHERE email = ? and password= ?", params);
     const users = result[0];
     if (users.length == 0) {
@@ -105,7 +104,7 @@ function toCamelCaseObj(obj) {
 }
 // Create Commmon Error Handler
 app.use(function (err, req, res, next) {
-    console.log("common error handler")
+    //console.log("common error handler")
     console.error(err);
     res.json({ errorMessage: err.message });
 })
@@ -113,7 +112,6 @@ app.use(function (err, req, res, next) {
 async function getTicket(req, res) {
     const id = req.params.id;
     let params = [id];
-    console.log(params);
     const result = await pool.query("SELECT *FROM tickets WHERE id = ?", params);
     const users = result[0];
     if (users.length == 0) {
@@ -125,7 +123,6 @@ async function getTicket(req, res) {
 async function updateTicket(req, res) {
     const id = req.params.id;
     const ticket = req.body;
-    console.log(ticket);
     let params = [ticket.title,ticket.ticketstatus,ticket.description, ticket.priority, ticket.teamAssign,id];
     const result = await pool.query("UPDATE tickets SET title=?, ticketstatus = ?, description= ?, priority = ?, team_assign = ? WHERE id = ?", params);
     res.status(201).json(result[0].info);
