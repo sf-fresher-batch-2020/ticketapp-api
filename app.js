@@ -32,6 +32,8 @@ app.get('/api/tickets', getAllTickets);
 app.get('/api/tickets/:id', getTicket);
 app.put('/api/tickets/:id', updateTicket);
 app.delete('/api/tickets/:id', deleteTicket);
+app.get('/api/ticketsstatus',getTicketByStatus);
+app.get('/api/teamtickets',geTicketByTeamStatus);
 // Functions
 async function createUser(req, res) {
     let user = req.body;
@@ -68,6 +70,21 @@ async function createTicket(req, res) {
 async function getAllTickets(req, res) {
     const result = await pool.query("SELECT * FROM tickets");
     let tickets = toCamelCase(result[0]);
+    res.status(200).json(tickets);
+}
+
+async function getTicketByStatus(req,res){
+    const result = await pool.query("SELECT ticketstatus,count(*) as count FROM tickets group by ticketstatus");
+    let tickets = toCamelCase(result[0]);
+    //console.log(tickets);
+    //let ticketStatus = _.groupBy(tickets,obj=>obj.ticketstatus);
+    res.status(200).json(tickets);
+}
+async function geTicketByTeamStatus(req,res){
+    const result = await pool.query("SELECT team_Assign,count(*) as count FROM tickets group by team_Assign");
+    let tickets = toCamelCase(result[0]);
+    //console.log(tickets);
+    //let ticketStatus = _.groupBy(tickets,obj=>obj.ticketstatus);
     res.status(200).json(tickets);
 }
 
