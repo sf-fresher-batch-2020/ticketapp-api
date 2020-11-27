@@ -53,13 +53,13 @@ app.get('/api/users', JwtUtil.authenticateToken, getAllUsers);
 app.post('/api/users/login', login);
 
 //tickets
-app.post('/api/tickets', createTicket);
-app.get('/api/tickets', getAllTickets);
-app.get('/api/tickets/:id', getTicket);
-app.put('/api/tickets/:id', updateTicket);
-app.delete('/api/tickets/:id', deleteTicket);
-app.get('/api/ticketsstatus', getTicketByStatus);
-app.get('/api/teamtickets', geTicketByTeamStatus);
+app.post('/api/tickets',JwtUtil.authenticateToken,createTicket);
+app.get('/api/tickets',JwtUtil.authenticateToken, getAllTickets);
+app.get('/api/tickets/:id',JwtUtil.authenticateToken, getTicket);
+app.put('/api/tickets/:id',JwtUtil.authenticateToken, updateTicket);
+app.delete('/api/tickets/:id',JwtUtil.authenticateToken, deleteTicket);
+app.get('/api/ticketsstatus',JwtUtil.authenticateToken, getTicketByStatus);
+app.get('/api/teamtickets',JwtUtil.authenticateToken, geTicketByTeamStatus);
 
 
 // Functions
