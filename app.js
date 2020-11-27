@@ -20,10 +20,36 @@ const pool = mysql.createPool({
     connectionLimit: 1
 });
 
+
+// JWT Authenticate Token
+class JwtUtil {
+    static authenticateToken(req, res, next) {
+        // Gather the jwt access token from the request header
+        const authHeader = req.headers['authorization']
+        const token = authHeader && authHeader.split(' ')[1]
+        if (token == null) return res.sendStatus(401) // if there isn't any token
+
+        jwt.verify(token, TOKEN_SECRET, (err, user) => {
+            console.log(err)
+            if (err) return res.sendStatus(403)
+            req.user = user
+            next() // pass the execution off to whatever request the client intended
+        })
+    }
+
+}
+
+
+//Time Setting For Token
+function generateAccessToken(username) {
+    // expires after 60 mins (3600 seconds = 60 minutes)
+    return jwt.sign({ data: username }, TOKEN_SECRET, { expiresIn: 60 * 60 });
+}
+
 // Routes
 //users
 app.post('/api/users', createUser);
-app.get('/api/users', getAllUsers);
+app.get('/api/users', JwtUtil.authenticateToken, getAllUsers);
 app.post('/api/users/login', login);
 
 //tickets
@@ -32,8 +58,10 @@ app.get('/api/tickets', getAllTickets);
 app.get('/api/tickets/:id', getTicket);
 app.put('/api/tickets/:id', updateTicket);
 app.delete('/api/tickets/:id', deleteTicket);
-app.get('/api/ticketsstatus',getTicketByStatus);
-app.get('/api/teamtickets',geTicketByTeamStatus);
+app.get('/api/ticketsstatus', getTicketByStatus);
+app.get('/api/teamtickets', geTicketByTeamStatus);
+
+
 // Functions
 async function createUser(req, res) {
     let user = req.body;
@@ -51,12 +79,19 @@ async function getAllUsers(req, res) {
 async function login(req, res) {
     const user = req.body;
     let params = [user.email, user.password];
+    console.log(params);
     const result = await pool.query("SELECT id, name, email,role FROM users WHERE email = ? and password= ?", params);
     const users = result[0];
     if (users.length == 0) {
         throw new Error("Invalid Login Credentials");
     }
-    res.status(201).json(users[0]);
+    //res.status(201).json(users[0]);
+    else {
+        let user = users[0];
+        let token = generateAccessToken(user);
+        user['token'] = token; // Add token in user details 
+        res.status(201).json(user);
+    }
 }
 // Ticket Function
 async function createTicket(req, res) {
@@ -72,14 +107,14 @@ async function getAllTickets(req, res) {
     res.status(200).json(tickets);
 }
 
-async function getTicketByStatus(req,res){
+async function getTicketByStatus(req, res) {
     const result = await pool.query("SELECT ticketstatus,count(*) as count FROM tickets group by ticketstatus");
     let tickets = toCamelCase(result[0]);
     //console.log(tickets);
     //let ticketStatus = _.groupBy(tickets,obj=>obj.ticketstatus);
     res.status(200).json(tickets);
 }
-async function geTicketByTeamStatus(req,res){
+async function geTicketByTeamStatus(req, res) {
     const result = await pool.query("SELECT team_Assign,count(*) as count FROM tickets group by team_Assign");
     let tickets = toCamelCase(result[0]);
     //console.log(tickets);
@@ -104,7 +139,7 @@ function toCamelCaseObj(obj) {
 }
 // Create Commmon Error Handler
 app.use(function (err, req, res, next) {
-    //console.log("common error handler")
+    console.log("common error handler")
     console.error(err);
     res.json({ errorMessage: err.message });
 })
@@ -112,6 +147,7 @@ app.use(function (err, req, res, next) {
 async function getTicket(req, res) {
     const id = req.params.id;
     let params = [id];
+    console.log(params);
     const result = await pool.query("SELECT *FROM tickets WHERE id = ?", params);
     const users = result[0];
     if (users.length == 0) {
@@ -123,7 +159,8 @@ async function getTicket(req, res) {
 async function updateTicket(req, res) {
     const id = req.params.id;
     const ticket = req.body;
-    let params = [ticket.title,ticket.ticketstatus,ticket.description, ticket.priority, ticket.teamAssign,id];
+    console.log(ticket);
+    let params = [ticket.title, ticket.ticketstatus, ticket.description, ticket.priority, ticket.teamAssign, id];
     const result = await pool.query("UPDATE tickets SET title=?, ticketstatus = ?, description= ?, priority = ?, team_assign = ? WHERE id = ?", params);
     res.status(201).json(result[0].info);
 }
