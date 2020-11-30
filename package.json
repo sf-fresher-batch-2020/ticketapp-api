@@ -22,6 +22,7 @@
     "express": "^5.0.0-alpha.8",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
-    "mysql2": "^2.2.5"
+    "mysql2": "^2.2.5",
+    "nodemailer": "^6.4.16"
   }
 }
